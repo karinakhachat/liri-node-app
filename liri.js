@@ -74,8 +74,6 @@ var getSpotify = function(song){
     });
 }
 
-
-
 var GetTweets = function(tweet){
     var params = {
         screen_name = "RoseColoredNews",
@@ -86,8 +84,30 @@ var GetTweets = function(tweet){
           console.log(tweets);
         }
       });
-      
+          }
+
+    var DoIt = function(){
+        fs.readFile("random.txt", "utf-8", function(err, data){
+            if (err){
+                return console.log(err);
+            }
+            var CommandArr = data.split(",");
+            spotify
+            .request('https://api.spotify.com/v1/search?q=track:' + CommandArr[1] + '&type=track')
+            .then(function (data) {
+                console.log("\nSong: " + JSON.stringify(data.tracks.items[0].name, null, 2));
+                console.log("Artist: " + JSON.stringify(data.tracks.items[0].album.artists[0].name, null, 2));
+                console.log("Album: " + JSON.stringify(data.tracks.items[0].album.name, null, 2));
+                console.log("Spotify Link: " + JSON.stringify(data.tracks.items[0].artists[0].external_urls.spotify, null, 2));
+
+
+            })
+            .catch(function (err) {
+                console.error('Error occurred: ' + err);
+            });
+    });
 }
+       
 
 
 if (userComand === "movie-this"){
