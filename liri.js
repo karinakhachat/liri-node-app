@@ -1,4 +1,5 @@
 require("dotenv").config();
+
 var Twitter = require("twitter");
 var spotify = require("node-spotify-api");
 var keysjs = require("./keys.js");
@@ -6,8 +7,6 @@ var request = require("request");
 var fs = require("fs");
 
 
-//var spotify = new Spotify(keys.spotify);
-//var client = new Twitter(keys.twitter);
 
 //four different functions, one for each. one will be a process.argv, 
 
@@ -17,73 +16,87 @@ var fs = require("fs");
 var userComand = process.argv[2];
 var userPick = process.argv[3];
 
-if (userComand === "movie-this") {
-
-    function getMovie(userPick) {
-
-        var queryUrl = "http://www.omdbapi.com/?t=" + userPick + "&y=&plot=short&apikey=trilogy";
 
 
-        request(queryUrl, function (error, response, body) {
-
-            // If the request is successful
-            if (!error && response.statusCode === 200) {
-
-                console.log("Release Year: " + JSON.parse(body).Year);
-            }
-        });
+var getMovie = function(movie) {
+    if (movie === undefined) {
+        movie = "Mr Nobody";
     }
-}
-if (userPick === null && userComand == "movie-this") {
 
-    var queryUrl = "http://www.omdbapi.com/?t='Mr.Nobody'&y=&plot=short&apikey=trilogy";
-    request(queryUrl, function (error, response, body) {
+    var queryUrl = "http://www.omdbapi.com/?t=" + userPick + "&y=&plot=short&apikey=trilogy";
 
-        // If the request is successful
-        if (!error && response.statusCode === 200) {
+    request(queryUrl, function(err, res, body) {
+        if(!err && res.statusCode === 200) {
+            var data = JSON.parse(body);
 
-            console.log("Release Year: " + JSON.parse(body).Year);
+            console.log("Title: " + data.Title);
+            console.log("Year: " + data.Year);
+            console.log("Rated: " + data.Rated);
+
         }
+    })
+}
+
+getMovie(userPick); 
+     
+var getSpotify = function(song){
+    if (song === undefined){
+        spotify.request('https://api.spotify.com/v1/tracks/3DYVWvPh3kGwPasp7yjahc')
+      .then(function (data) {
+        // console.log(JSON.stringify(data, null, 2))
+        var info = data.album
+
+        console.log(
+          "\nArtist: " + info.artists[0].name +
+          "\nSong title: " + data.name +
+          "\nAlbum name: " + info.name +
+          "\nURL Preview: " + data.preview_url)
+      })
+      .catch(function (err) {
+        console.error('Error occurred: ' + err);
+      });
+    }
+
+    spotify.search({ type: 'track', query: song})
+    .then(function(response) {
+
+        var info = date.tracks.items;
+
+    console.log(
+            "\nArtist: " + info[0].artists[0].name +
+            "\nSong title: " + info[0].name +
+            "\nAlbum name: " + info[0].album.name +
+            "\nURL Preview: " + info[0].preview_url)
+  
+    })
+    .catch(function(err) {
+      console.log(err);
     });
 }
 
-if (userComand == "my-tweets") {
-    var params = { screen_name: 'RoseColoredNews', count: 20 };
-    twitter.get("https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=twitterapi", params, function (error, tweets, response) {
+
+
+var GetTweets = function(tweet){
+    var params = {
+        screen_name = "RoseColoredNews",
+        count: 20
+    }
+    client.get('statuses/RoseColoredNews_timeline', params, function(error, tweets, response) {
         if (!error) {
-            console.log(tweets);
+          console.log(tweets);
         }
-    },
-        fs.appendFile("random.txt", ", -" + tweets, function (err) {
-            if (err) {
-                return console.log(err);
-            }
-        })
-
-
-    )
+      });
+      
 }
 
-if (userComand == "spotify-this") {
-    function Spotify() {
-        spotify.search({
-            type: 'track',
-            query: title,
-            limit: 1,
-        }, function (err, data) {
-            if (data) {
-                var info = data.tracks.items
-                var Spotifyinfo =
-                    "\nSong title: " + info[0].name +
-                    "\nAlbum name: " + info[0].album.name +
-                    "\nURL Preview: " + info[0].preview_url +
-                    console.log(Spotifyinfo)
-                fs.appendFile("log.txt", logSpotify, function (err) {
-                    if (err) {
-                        return console.log("No song has been Spotified!");
-                    };
-                });
-            }
-        })
-    }
+
+if (userComand === "movie-this"){
+    getMovie(userPick);
+}
+
+else if (userComand === "spotify-this"){
+    getSpotify(userPick);
+}
+else if(userComand === "my-tweets"){
+    GetTweets();
 }
