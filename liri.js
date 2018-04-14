@@ -6,8 +6,8 @@ var request = require("request");
 var fs = require("fs");
 
 
-var spotify = new Spotify(keys.spotify);
-var client = new Twitter(keys.twitter);
+//var spotify = new Spotify(keys.spotify);
+//var client = new Twitter(keys.twitter);
 
 //four different functions, one for each. one will be a process.argv, 
 
@@ -34,7 +34,7 @@ if (userComand === "movie-this") {
         });
     }
 }
-if (userPick === null) {
+if (userPick === null && userComand == "movie-this") {
 
     var queryUrl = "http://www.omdbapi.com/?t='Mr.Nobody'&y=&plot=short&apikey=trilogy";
     request(queryUrl, function (error, response, body) {
