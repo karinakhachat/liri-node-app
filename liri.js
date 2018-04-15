@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 var Twitter = require("twitter");
-var spotify = require("node-spotify-api");
+var Spotify = require("node-Spotify-api");
 var keysjs = require("./keys.js");
 var request = require("request");
 var fs = require("fs");
@@ -13,16 +13,17 @@ var fs = require("fs");
 //use the request package to make an api call 
 //and get back a json object 
 //if process. argv 
-var userComand = process.argv[2];
-var userPick = process.argv[3];
+var userComand = process.argv;
+var userPick = process.argv[2];
 
-
+var spotify = new Spotify(keys.spotify);
+var client = new Twitter(keys.twitter);
 
 var getMovie = function(movie) {
     if (movie === undefined) {
         movie = "Mr Nobody";
     }
-
+   
     var queryUrl = "http://www.omdbapi.com/?t=" + userPick + "&y=&plot=short&apikey=trilogy";
 
     request(queryUrl, function(err, res, body) {
@@ -37,7 +38,7 @@ var getMovie = function(movie) {
     })
 }
 
-getMovie(userPick); 
+
      
 var getSpotify = function(song){
     if (song === undefined){
