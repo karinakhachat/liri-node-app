@@ -26,13 +26,11 @@ var client = new Twitter(keys.twitter);
 
 
 var getMovie = function (movie) {
-    if (userComand === "movie-this") {
-        if (process.argv[3] === undefined) {
-            userPick= "Mr.+Nobody"
-        }
-        getMovie(userPick);
-     }
-   var queryUrl = "http://www.omdbapi.com/?t=" + userPick + "&y=&plot=short&apikey=trilogy";
+    if (process.argv[3] === undefined) {
+        userPick= "Mr.+Nobody"
+    }
+   
+    var queryUrl = "http://www.omdbapi.com/?t=" + userPick + "&y=&plot=short&apikey=trilogy";
 
    request(queryUrl, function (err, res, body) {
        if (!err && res.statusCode === 200) {
@@ -45,6 +43,8 @@ var getMovie = function (movie) {
        }
    })
 }
+
+
 
 var getSpotify = function (song) {
     if (song === undefined) {
@@ -66,14 +66,13 @@ var getSpotify = function (song) {
 
     spotify.search({ type: 'track', query: song })
         .then(function (response) {
-
-            var info = date.tracks.items;
-
+            console.log(JSON.stringify(response.tracks.items[0], null, 2));
+            //var info = .tracks.items;
             console.log(
-                "\nArtist: " + info[0].artists[0].name +
-                "\nSong title: " + info[0].name +
-                "\nAlbum name: " + info[0].album.name +
-                "\nURL Preview: " + info[0].preview_url)
+                "\nArtist: " + response.items[0].artists[0].name +
+                "\nSong title: " + response.items[0].name +
+                "\nAlbum name: " + response.items[0].album.name +
+                "\nURL Preview: " + response.items[0].preview_url)
 
         })
         .catch(function (err) {
@@ -123,11 +122,12 @@ var DoIt = function () {
 
 if (userComand === "movie-this") {
     getMovie(userPick);
+
 }
 
 else if (userComand === "spotify-this") {
     getSpotify(userPick);
 }
 else if (userComand === "my-tweets") {
-    GetTweets();
+    getTweets();
 }
