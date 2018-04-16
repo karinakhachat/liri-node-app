@@ -2,98 +2,108 @@ require("dotenv").config();
 
 var Twitter = require("twitter");
 var Spotify = require("node-Spotify-api");
-var keysjs = require("./keys.js");
+var keys = require("./keys.js");
 var request = require("request");
-var fs = require("fs");
-
-
-
-//four different functions, one for each. one will be a process.argv, 
+var fs = require("fs")
+//four different functions, one for each. one will be a process.argv,
 
 //use the request package to make an api call 
 //and get back a json object 
 //if process. argv 
-var userComand = process.argv;
-var userPick = process.argv[2];
+var info = process.argv;
+var userComand = process.argv[2];
+
+var userPick =  ""
+if (process.argv[3] !== undefined) {
+   for (i = 3; i < info.length; i++) {
+       userPick += info[i] + " ";
+   };
+};
 
 var spotify = new Spotify(keys.spotify);
 var client = new Twitter(keys.twitter);
 
-var getMovie = function(movie) {
-    if (movie === undefined) {
-        movie = "Mr Nobody";
-    }
-   
-    var queryUrl = "http://www.omdbapi.com/?t=" + userPick + "&y=&plot=short&apikey=trilogy";
 
-    request(queryUrl, function(err, res, body) {
-        if(!err && res.statusCode === 200) {
-            var data = JSON.parse(body);
 
-            console.log("Title: " + data.Title);
-            console.log("Year: " + data.Year);
-            console.log("Rated: " + data.Rated);
-
+var getMovie = function (movie) {
+    if (userComand === "movie-this") {
+        if (process.argv[3] === undefined) {
+            userPick= "Mr.+Nobody"
         }
-    })
+        getMovie(userPick);
+     }
+   var queryUrl = "http://www.omdbapi.com/?t=" + userPick + "&y=&plot=short&apikey=trilogy";
+
+   request(queryUrl, function (err, res, body) {
+       if (!err && res.statusCode === 200) {
+           var data = JSON.parse(body);
+
+           console.log("Title: " + data.Title);
+           console.log("Year: " + data.Year);
+           console.log("Rated: " + data.Rated);
+
+       }
+   })
 }
 
-
-     
-var getSpotify = function(song){
-    if (song === undefined){
+var getSpotify = function (song) {
+    if (song === undefined) {
         spotify.request('https://api.spotify.com/v1/tracks/3DYVWvPh3kGwPasp7yjahc')
-      .then(function (data) {
-        // console.log(JSON.stringify(data, null, 2))
-        var info = data.album
+            .then(function (data) {
+                // console.log(JSON.stringify(data, null, 2))
+                var info = data.album
 
-        console.log(
-          "\nArtist: " + info.artists[0].name +
-          "\nSong title: " + data.name +
-          "\nAlbum name: " + info.name +
-          "\nURL Preview: " + data.preview_url)
-      })
-      .catch(function (err) {
-        console.error('Error occurred: ' + err);
-      });
+                console.log(
+                    "\nArtist: " + info.artists[0].name +
+                    "\nSong title: " + data.name +
+                    "\nAlbum name: " + info.name +
+                    "\nURL Preview: " + data.preview_url)
+            })
+            .catch(function (err) {
+                console.error('Error occurred: ' + err);
+            });
     }
 
-    spotify.search({ type: 'track', query: song})
-    .then(function(response) {
+    spotify.search({ type: 'track', query: song })
+        .then(function (response) {
 
-        var info = date.tracks.items;
+            var info = date.tracks.items;
 
-    console.log(
-            "\nArtist: " + info[0].artists[0].name +
-            "\nSong title: " + info[0].name +
-            "\nAlbum name: " + info[0].album.name +
-            "\nURL Preview: " + info[0].preview_url)
-  
-    })
-    .catch(function(err) {
-      console.log(err);
-    });
+            console.log(
+                "\nArtist: " + info[0].artists[0].name +
+                "\nSong title: " + info[0].name +
+                "\nAlbum name: " + info[0].album.name +
+                "\nURL Preview: " + info[0].preview_url)
+
+        })
+        .catch(function (err) {
+            console.log(err);
+        });
 }
 
-var GetTweets = function(tweet){
+var getTweets = function(tweet) {
     var params = {
-        screen_name = "RoseColoredNews",
+        screen_name: 'RoseColoredNews',
         count: 20
-    }
-    client.get('statuses/RoseColoredNews_timeline', params, function(error, tweets, response) {
+    };
+    client.get('statuses/user_timeline', params, function (error, tweets, response) {
         if (!error) {
-          console.log(tweets);
-        }
-      });
-          }
-
-    var DoIt = function(){
-        fs.readFile("random.txt", "utf-8", function(err, data){
-            if (err){
-                return console.log(err);
+            for (i = 0; i < tweets.length; i++) {
+                var logTweets = "Tweet: " + tweets[i].text + "\n    Created: " + tweets[i].created_at;
+                console.log(logTweets);
             }
-            var CommandArr = data.split(",");
-            spotify
+        }
+    });
+ }
+
+
+var DoIt = function () {
+    fs.readFile("random.txt", "utf-8", function (err, data) {
+        if (err) {
+            return console.log(err);
+        }
+        var CommandArr = data.split(",");
+        spotify
             .request('https://api.spotify.com/v1/search?q=track:' + CommandArr[1] + '&type=track')
             .then(function (data) {
                 console.log("\nSong: " + JSON.stringify(data.tracks.items[0].name, null, 2));
@@ -108,16 +118,16 @@ var GetTweets = function(tweet){
             });
     });
 }
-       
 
 
-if (userComand === "movie-this"){
+
+if (userComand === "movie-this") {
     getMovie(userPick);
 }
 
-else if (userComand === "spotify-this"){
+else if (userComand === "spotify-this") {
     getSpotify(userPick);
 }
-else if(userComand === "my-tweets"){
+else if (userComand === "my-tweets") {
     GetTweets();
 }
